@@ -10,7 +10,7 @@ const MAX_INTEGER = 2147483647;
 class Company {
   // parameters => {search: "", min_employees: #, max_employees: #}
   // returns list filtered by parameters (optional)
-  static async get({ searchTerm = "", min_employees = 0, max_employees = MAX_INTEGER }) {
+  static async getList({ searchTerm = "", min_employees = 0, max_employees = MAX_INTEGER }) {
     // default search to empty string, then make it look like %search%
     searchTerm = `%${searchTerm}%`;
 
@@ -27,6 +27,20 @@ class Company {
     return results.rows;
   }
 
+  static async get(handle) {
+    const result = await db.query(
+      `SELECT handle, name, num_employees, description, logo_url
+        FROM companies
+        WHERE handle=$1`,
+      [handle]);
+
+    if (result.rows.length === 0) {
+      throw new ExpressError("Handle does not match any companies", 404);
+    }
+
+    return result.rows[0];
+  }
+
   // Inserts a new company into our database
   static async make(data) {
     const result = await db.query(
@@ -41,9 +55,27 @@ class Company {
   }
 
   static async update(handle, data) {
-    const {query, values} = sqlForPartialUpdate('companies', data, "handle", handle);
+    const { query, values } = sqlForPartialUpdate('companies', data, "handle", handle);
     const result = await db.query(query, values);
+
+    if (result.rows.length === 0) {
+      throw new ExpressError("Handle does not match any companies", 404);
+    }
+
     return result.rows[0];
+  }
+
+  static async delete(handle) {
+    const result = await db.query(
+      `DELETE FROM companies
+        WHERE handle=$1
+        RETURNING handle`,
+      [handle]
+    );
+
+    if (result.rows.length === 0) {
+      throw new ExpressError("Handle does not match any companies", 404);
+    }
   }
 
 }
