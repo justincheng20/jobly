@@ -5,8 +5,8 @@
   "type": "object",
   "title": "The Root Schema",
   "required": [
-    "handle",
-    "name"
+    "_handle",
+    "_name"
   ],
   "properties": {
     "_handle": {
