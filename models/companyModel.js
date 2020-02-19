@@ -1,5 +1,6 @@
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
+const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
 /**
  * Maximum value for a PSQL integer type
@@ -9,7 +10,7 @@ const MAX_INTEGER = 2147483647;
 class Company {
   // parameters => {search: "", min_employees: #, max_employees: #}
   // returns list filtered by parameters (optional)
-  static async getCompanies({ searchTerm = "", min_employees = 0, max_employees = MAX_INTEGER }) {
+  static async get({ searchTerm = "", min_employees = 0, max_employees = MAX_INTEGER }) {
     // default search to empty string, then make it look like %search%
     searchTerm = `%${searchTerm}%`;
 
@@ -26,7 +27,8 @@ class Company {
     return results.rows;
   }
 
-  static async makeCompany(data) {
+  // Inserts a new company into our database
+  static async make(data) {
     const result = await db.query(
       `INSERT INTO companies
         (handle, name, num_employees, description, logo_url)
@@ -37,6 +39,13 @@ class Company {
 
     return result.rows[0];
   }
+
+  static async update(handle, data) {
+    const {query, values} = sqlForPartialUpdate('companies', data, "handle", handle);
+    const result = await db.query(query, values);
+    return result.rows[0];
+  }
+
 }
 
 module.exports = Company;

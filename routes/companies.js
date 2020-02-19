@@ -3,6 +3,7 @@ const router = express.Router();
 const Company = require("../models/companyModel");
 const ExpressError = require("../helpers/expressError");
 
+
 /**
  * GET /companies -> list of all companies
  * Query parameters:
@@ -13,7 +14,7 @@ const ExpressError = require("../helpers/expressError");
 
 router.get("/", async function (req, res, next) {
   try {
-    const companies = await Company.getCompanies(req.query);
+    const companies = await Company.get(req.query);
 
     return res.json({ companies });
   } catch (err) {
@@ -29,7 +30,20 @@ router.get("/", async function (req, res, next) {
 
 router.post("/", async function (req, res, next) {
   try {
-    const company = await Company.makeCompany(req.body);
+    const company = await Company.make(req.body);
+    return res.json({ company });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
+ * PATCH companies: can update using partial info. 
+ */
+router.patch("/:handle", async function (req, res, next) {
+  try {
+    let handle = req.params.handle;
+    const company = await Company.update(handle, req.body);
     return res.json({ company });
   } catch (err) {
     return next(err);
