@@ -15,7 +15,22 @@ router.get("/", async function (req, res, next) {
   try {
     const companies = await Company.getCompanies(req.query);
 
-    return res.json({ companies })
+    return res.json({ companies });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
+ * POST companies -> make a new company
+ * Expects JSON: {handle (required), name (required), 
+ * num_employees (defaults to 0), description, logo_url } 
+ */
+
+router.post("/", async function (req, res, next) {
+  try {
+    const company = await Company.makeCompany(req.body);
+    return res.json({ company });
   } catch (err) {
     return next(err);
   }
