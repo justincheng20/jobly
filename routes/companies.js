@@ -4,6 +4,7 @@ const Company = require("../models/companyModel");
 const ExpressError = require("../helpers/expressError");
 const jsonschema = require("jsonschema");
 const companySchema = require("../schemas/companySchema");
+const companyUpdateSchema = require("../schemas/companyUpdateSchema");
 
 
 /**
@@ -16,7 +17,7 @@ const companySchema = require("../schemas/companySchema");
 
 router.get("/", async function (req, res, next) {
   try {
-    const companies = await Company.getList(req.query);
+    const companies = await Company.getCompanies(req.query);
 
     return res.json({ companies });
   } catch (err) {
@@ -32,17 +33,14 @@ router.get("/", async function (req, res, next) {
 
 router.post("/", async function (req, res, next) {
   try {
-    // Set up to pass schema
-    req.body._name = req.body.name;
-    req.body._handle = req.body.handle;
-
+    
     const result = jsonschema.validate(req.body, companySchema);
 
     if(!result.valid){
       let listOfErrors = result.errors.map(error => error.stack);
       throw new ExpressError(listOfErrors, 400);
     }
-    const company = await Company.make(req.body);
+    const company = await Company.create(req.body);
     return res.json({ company });
   } catch (err) {
     return next(err);
@@ -70,13 +68,10 @@ router.get("/:handle", async function (req, res, next) {
  */
 router.patch("/:handle", async function (req, res, next) {
   try {
-    // Set up to pass schema regardless of whether input was given
-    // (so that it still does the update right)
-    req.body._handle = req.body.handle || "";
-    req.body._name = req.body.name || "";
+    
     let handle = req.params.handle;
 
-    const result = jsonschema.validate(req.body, companySchema);
+    const result = jsonschema.validate(req.body, companyUpdateSchema);
 
     if(!result.valid){
       let listOfErrors = result.errors.map(error => error.stack);

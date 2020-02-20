@@ -5,11 +5,11 @@
   "type": "object",
   "title": "The Root Schema",
   "required": [
-    "_handle",
-    "_name"
+    "handle",
+    "name"
   ],
   "properties": {
-    "_handle": {
+    "handle": {
       "$id": "#/properties/handle",
       "type": "string",
       "title": "The Handle Schema",
@@ -19,7 +19,7 @@
       ],
       "pattern": "^(.*)$"
     },
-    "_name": {
+    "name": {
       "$id": "#/properties/name",
       "type": "string",
       "title": "The Name Schema",

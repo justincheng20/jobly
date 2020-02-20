@@ -10,7 +10,7 @@ const MAX_INTEGER = 2147483647;
 class Company {
   // parameters => {search: "", min_employees: #, max_employees: #}
   // returns list filtered by parameters (optional)
-  static async getList({ searchTerm = "", min_employees = 0, max_employees = MAX_INTEGER }) {
+  static async getCompanies({ searchTerm = "", min_employees = 0, max_employees = MAX_INTEGER }) {
     // default search to empty string, then make it look like %search%
     searchTerm = `%${searchTerm}%`;
 
@@ -42,13 +42,14 @@ class Company {
   }
 
   // Inserts a new company into our database
-  static async make(data) {
+  static async create({handle, name, num_employees = 0, description, logo_url}) {
+    
     const result = await db.query(
       `INSERT INTO companies
         (handle, name, num_employees, description, logo_url)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING handle, name, num_employees, description, logo_url`,
-      [data.handle, data.name, data.num_employees || 0, data.description, data.logo_url]
+      [handle, name, num_employees, description, logo_url]
     );
 
     return result.rows[0];
