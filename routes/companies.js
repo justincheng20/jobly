@@ -18,7 +18,6 @@ const companyUpdateSchema = require("../schemas/companyUpdateSchema");
 router.get("/", async function (req, res, next) {
   try {
     const companies = await Company.getCompanies(req.query);
-
     return res.json({ companies });
   } catch (err) {
     return next(err);
@@ -33,10 +32,10 @@ router.get("/", async function (req, res, next) {
 
 router.post("/", async function (req, res, next) {
   try {
-    
+
     const result = jsonschema.validate(req.body, companySchema);
 
-    if(!result.valid){
+    if (!result.valid) {
       let listOfErrors = result.errors.map(error => error.stack);
       throw new ExpressError(listOfErrors, 400);
     }
@@ -68,12 +67,12 @@ router.get("/:handle", async function (req, res, next) {
  */
 router.patch("/:handle", async function (req, res, next) {
   try {
-    
+
     let handle = req.params.handle;
 
     const result = jsonschema.validate(req.body, companyUpdateSchema);
 
-    if(!result.valid){
+    if (!result.valid) {
       let listOfErrors = result.errors.map(error => error.stack);
       throw new ExpressError(listOfErrors, 400);
     }

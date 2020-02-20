@@ -78,7 +78,10 @@ describe("Company Routes Test", function () {
                 .post("/companies")
                 .send(testCompany3);
 
+            const allCompanies = await Company.getCompanies({});
+
             expect(resp.body).toEqual({ company: testCompany3 });
+            expect(allCompanies.length).toBe(3);
         });
 
         test("Can not create company with invalid input", async function () {
