@@ -20,6 +20,14 @@ const testCompany2 = {
     logo_url: "testLogoUrl2.com"
 }
 
+const testCompany3 = {
+    handle: "test3Handle3",
+    name: "test3Name3",
+    num_employees: 3,
+    description: "test description3",
+    logo_url: "testLogoUrl3.com"
+}
+
 describe("Company Routes Test", function () {
 
     beforeEach(async function () {
@@ -62,14 +70,6 @@ describe("Company Routes Test", function () {
 
     describe("POST /companies", function () {
         test("Can make a new company", async function () {
-            let testCompany3 = {
-                handle: "test3Handle3",
-                name: "test3Name3",
-                num_employees: 3,
-                description: "test description3",
-                logo_url: "testLogoUrl3.com"
-            }
-
             let resp = await request(app)
                 .post("/companies")
                 .send(testCompany3);
@@ -88,7 +88,7 @@ describe("Company Routes Test", function () {
         });
     });
 
-    describe("Get /company:handle", function () {
+    describe("Get /companies/:handle", function () {
         test("Can get a company by its handle", async function () {
             let handle = testCompany1.handle;
             let resp = await request(app).get(`/companies/${handle}`);
@@ -98,6 +98,77 @@ describe("Company Routes Test", function () {
         test("Returns 404 error on invalid handle", async function () {
             let handle = "invalidHandle";
             let resp = await request(app).get(`/companies/${handle}`);
+            expect(resp.body).toEqual({ message: expect.any(String), status: 404 });
+        });
+    });
+
+    describe("PATCH /companies/:handle", function () {
+        test("Can patch company with a full object", async function () {
+            let handle = testCompany1.handle;
+            let resp = await request(app)
+                .patch(`/companies/${handle}`)
+                .send(testCompany3);
+
+            expect(resp.body).toEqual({ company: testCompany3 });
+        });
+
+        test("Can patch company with partial data", async function () {
+            let smallChange = {
+                description: "description test!"
+            };
+            let expected = {
+                ...testCompany1
+            };
+            expected.description = smallChange.description;
+
+            let handle = testCompany1.handle;
+            let resp = await request(app)
+                .patch(`/companies/${handle}`)
+                .send(smallChange);
+
+            expect(resp.body).toEqual({ company: expected });
+        });
+
+        test("Returns 404 error on invalid handle", async function () {
+            let handle = "invalidHandle";
+            let resp = await request(app)
+                .patch(`/companies/${handle}`)
+                .send(testCompany3);
+            expect(resp.body).toEqual({ message: expect.any(String), status: 404 });
+        });
+
+        test("Returns 400 error on invalid info", async function () {
+            let invalidChange = { num_employees: "3" }
+            let handle = testCompany1.handle;
+            let resp = await request(app)
+                .patch(`/companies/${handle}`)
+                .send(invalidChange);
+
+            expect(resp.body).toEqual({ message: expect.any(Array), status: 400 });
+            expect(resp.body.message.length).toBe(1);
+        });
+
+        test("Returns 400 error on non-unique info", async function () {
+            let handle = testCompany1.handle;
+            let resp = await request(app)
+                .patch(`/companies/${handle}`)
+                .send(testCompany2);
+
+            expect(resp.body).toEqual({ message: expect.any(String), status: 400 });
+        });
+    });
+
+    describe("DELETE /companies/:", function () {
+        test("Can delete a company", async function () {
+            let handle = testCompany1.handle;
+            let resp = await request(app).delete(`/companies/${handle}`);
+
+            expect(resp.body).toEqual({ message: "Deleted" });
+        });
+
+        test("Returns 404 error on invalid handle", async function () {
+            let handle = "invalidHandle";
+            let resp = await request(app).delete(`/companies/${handle}`);
             expect(resp.body).toEqual({ message: expect.any(String), status: 404 });
         });
     });

@@ -55,14 +55,20 @@ class Company {
   }
 
   static async update(handle, data) {
-    const { query, values } = sqlForPartialUpdate('companies', data, "handle", handle);
-    const result = await db.query(query, values);
+    try {
+      const { query, values } = sqlForPartialUpdate('companies', data, "handle", handle);
+      const result = await db.query(query, values);
 
-    if (result.rows.length === 0) {
-      throw new ExpressError("Handle does not match any companies", 404);
+      if (result.rows.length === 0) {
+        throw new ExpressError("Handle does not match any companies", 404);
+      }
+      return result.rows[0];
+    } catch (err) {
+      // TODO: Come back later and figure out how to deal with database errors
+      err.message = err.message || "Temporary placeholder for database errors";
+      err.status = err.status || 400;
+      throw err;
     }
-
-    return result.rows[0];
   }
 
   static async delete(handle) {
