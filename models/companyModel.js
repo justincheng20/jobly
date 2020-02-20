@@ -14,7 +14,7 @@ class Company {
     // default search to empty string, then make it look like %search%
     searchTerm = `%${searchTerm}%`;
 
-    if (max_employees < min_employees) {
+    if (+max_employees < +min_employees) {
       throw new ExpressError("Max must be >= min", 400);
     }
 
@@ -65,7 +65,7 @@ class Company {
       return result.rows[0];
     } catch (err) {
       // TODO: Come back later and figure out how to deal with database errors
-      err.message = err.message || "Temporary placeholder for database errors";
+      // err.message = err.message || "Temporary placeholder for database errors";
       err.status = err.status || 400;
       throw err;
     }

@@ -74,6 +74,7 @@ router.patch("/:handle", async function (req, res, next) {
     // (so that it still does the update right)
     req.body._handle = req.body.handle || "";
     req.body._name = req.body.name || "";
+    let handle = req.params.handle;
 
     const result = jsonschema.validate(req.body, companySchema);
 
@@ -81,7 +82,6 @@ router.patch("/:handle", async function (req, res, next) {
       let listOfErrors = result.errors.map(error => error.stack);
       throw new ExpressError(listOfErrors, 400);
     }
-    let handle = req.params.handle;
     const company = await Company.update(handle, req.body);
     return res.json({ company });
   } catch (err) {
