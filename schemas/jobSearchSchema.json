@@ -1,0 +1,40 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "properties": {
+      "searchTerm": {
+        "$id": "#/properties/searchTerm",
+        "type": "string",
+        "title": "The Searchterm Schema",
+        "default": "",
+        "examples": [
+          "test"
+        ],
+        "pattern": "^(.*)$"
+      },
+      "min_salary": {
+        "$id": "#/properties/min_salary",
+        "type": "number",
+        "title": "The Min_salary Schema",
+        "default": 0.0,
+        "examples": [
+          1.2
+        ],
+        "minimum":0
+      },
+      "min_equity": {
+        "$id": "#/properties/min_equity",
+        "type": "number",
+        "title": "The Min_equity Schema",
+        "default": 0.0,
+        "examples": [
+          0.1
+        ],
+        "minimum":0,
+        "maximum":1
+      }
+    }
+  }

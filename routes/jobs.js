@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Job = require("../models/jobModel");
 const ExpressError = require("../helpers/expressError");
-// const jsonschema = require("jsonschema");
-// const companySchema = require("../schemas/companySchema");
-// const companyUpdateSchema = require("../schemas/companyUpdateSchema");
+const jsonschema = require("jsonschema");
+const jobSchema = require("../schemas/jobSchema");
+const jobUpdateSchema = require("../schemas/jobUpdateSchema");
+const jobSearchSchema = require("../schemas/jobSearchSchema");
 
 
 /**
@@ -17,6 +18,12 @@ const ExpressError = require("../helpers/expressError");
 
 router.get("/", async function (req, res, next) {
   try {
+    const result = jsonschema.validate(req.query, jobSearchSchema);
+
+    if(!result.valid) {
+      let listOfErrors = result.errors.map(error => error.stack);
+      throw new ExpressError(listOfErrors, 400);
+    }
     const jobs = await Job.getJobs(req.query);
     return res.json({ jobs });
   } catch (err) {
@@ -32,12 +39,12 @@ router.get("/", async function (req, res, next) {
 
 router.post("/", async function (req, res, next) {
   try {
-    // const result = jsonschema.validate(req.body, companySchema);
+    const result = jsonschema.validate(req.body, jobSchema);
 
-    // if (!result.valid) {
-    //   let listOfErrors = result.errors.map(error => error.stack);
-    //   throw new ExpressError(listOfErrors, 400);
-    // }
+    if (!result.valid) {
+      let listOfErrors = result.errors.map(error => error.stack);
+      throw new ExpressError(listOfErrors, 400);
+    }
     const job = await Job.create(req.body);
     return res.json({ job });
   } catch (err) {
@@ -71,12 +78,12 @@ router.patch("/:id", async function (req, res, next) {
 
     let id = req.params.id;
 
-    // const result = jsonschema.validate(req.body, companyUpdateSchema);
+    const result = jsonschema.validate(req.body, jobUpdateSchema);
 
-    // if (!result.valid) {
-    //   let listOfErrors = result.errors.map(error => error.stack);
-    //   throw new ExpressError(listOfErrors, 400);
-    // }
+    if (!result.valid) {
+      let listOfErrors = result.errors.map(error => error.stack);
+      throw new ExpressError(listOfErrors, 400);
+    }
     const job = await Job.update(id, req.body);
     return res.json({ job });
   } catch (err) {
