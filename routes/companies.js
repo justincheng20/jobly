@@ -10,7 +10,7 @@ const companyUpdateSchema = require("../schemas/companyUpdateSchema");
 /**
  * GET /companies -> list of all companies
  * Query parameters:
- * -search => search string for filtering names
+ * -searchTerm => search string for filtering names
  * -min_employees
  * -max_employees
  */

@@ -31,7 +31,7 @@ class Job {
   static async get(id) {
     const result = await db.query(
       `SELECT
-        id, title, salary, equity, date_posted
+        id, title, salary, equity, date_posted,
         handle, name, num_employees, description, logo_url
         FROM jobs JOIN companies
           ON company_handle = handle
