@@ -31,18 +31,21 @@ describe("Company Routes Test", function () {
         test("Can get all companies", async function () {
             let resp = await request(app).get("/companies");
             expect(resp.body).toEqual({ companies: expect.any(Array) });
+            expect(resp.body.companies.length).toBe(2);
         });
 
         test("Can filter companies by number of minimum employees", async function () {
             let query = "?min_employees=2";
             let resp = await request(app).get(`/companies${query}`);
-            expect(resp.body).toEqual({ companies: [testCompany2] });
+            expect(resp.body).toEqual({ companies: expect.any(Array) });
+            expect(resp.body.companies.length).toBe(1);
         });
 
         test("Can filter companies by number of maximum employees", async function () {
             let query = "?max_employees=1";
             let resp = await request(app).get(`/companies${query}`);
-            expect(resp.body).toEqual({ companies: [testCompany1] });
+            expect(resp.body).toEqual({ companies: expect.any(Array) });
+            expect(resp.body.companies.length).toBe(1);
         });
 
         test("Returns error when max < min in query", async function () {
@@ -52,9 +55,12 @@ describe("Company Routes Test", function () {
         });
 
         test("Can filter by search term", async function () {
+            //testName vs test2Name2
+            //  ^^^^        ^^ ^^
             let query = "?searchTerm=stna";
             let resp = await request(app).get(`/companies${query}`);
-            expect(resp.body).toEqual({ companies: [testCompany1] });
+            expect(resp.body).toEqual({ companies: expect.any(Array) });
+            expect(resp.body.companies.length).toBe(1);
         });
     });
 
@@ -102,6 +108,13 @@ describe("Company Routes Test", function () {
 
     describe("PATCH /companies/:handle", function () {
         test("Can patch company with a full object", async function () {
+            let testCompany3 = {
+                handle: "test3Handle3",
+                name: "test3Name3",
+                num_employees: 3,
+                description: "test description3",
+                logo_url: "testLogoUrl3.com"
+            }
             let handle = testCompany1.handle;
             let resp = await request(app)
                 .patch(`/companies/${handle}`)
@@ -131,7 +144,13 @@ describe("Company Routes Test", function () {
             let handle = "invalidHandle";
             let resp = await request(app)
                 .patch(`/companies/${handle}`)
-                .send(testCompany3);
+                .send({
+                    handle: "test3Handle3",
+                    name: "test3Name3",
+                    num_employees: 3,
+                    description: "test description3",
+                    logo_url: "testLogoUrl3.com"
+                });
             expect(resp.body).toEqual({ message: expect.any(String), status: 404 });
         });
 
