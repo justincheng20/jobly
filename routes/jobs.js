@@ -18,7 +18,11 @@ const jobSearchSchema = require("../schemas/jobSearchSchema");
 
 router.get("/", async function (req, res, next) {
   try {
-    const result = jsonschema.validate(req.query, jobSearchSchema);
+    const query = {searchTerm: req.query.searchTerm, 
+      min_salary: +req.query.min_salary || 0, 
+      min_equity: +req.query.min_equity || 0}
+      
+    const result = jsonschema.validate(query, jobSearchSchema);
 
     if(!result.valid) {
       let listOfErrors = result.errors.map(error => error.stack);

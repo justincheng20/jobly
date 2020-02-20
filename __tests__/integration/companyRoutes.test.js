@@ -98,8 +98,9 @@ describe("Company Routes Test", function () {
     describe("Get /companies/:handle", function () {
         test("Can get a company by its handle", async function () {
             let handle = testCompany1.handle;
+            let expectedData = {...testCompany1, jobs: []}
             let resp = await request(app).get(`/companies/${handle}`);
-            expect(resp.body).toEqual({ company: testCompany1 });
+            expect(resp.body).toEqual({ company: expectedData });
         });
 
         test("Returns 404 error on invalid handle", async function () {

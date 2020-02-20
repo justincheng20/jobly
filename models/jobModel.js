@@ -1,7 +1,7 @@
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
-const Company = require("./companyModel");
+
 
 class Job {
   constructor({ id, title, salary, equity, company_handle, date_posted }) {
@@ -43,7 +43,10 @@ class Job {
     }
 
     let job = new Job(result.rows[0]);
-    let company = new Company(result.rows[0]);
+
+    let { handle, name, num_employees, description, logo_url } = result.rows[0]
+    let company = { handle, name, num_employees, description, logo_url };
+
 
     job.company = company;
 

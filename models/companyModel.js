@@ -33,24 +33,9 @@ class Company {
         FROM companies
         WHERE name ILIKE $1 AND num_employees >= $2 AND num_employees <= $3`,
       [searchTerm, min_employees, max_employees]);
-
+      
     return results.rows;
   }
-
-/**
-     * 
-     * [
-     * (...company1), (...job1),
-     * (...company1), (...job2)
-     * ]
-     * 
-     * [
-     * (...company1), ()
-     * ]
-     * 
-     * 
-     * {..., jobs: [{}]}
-     */
 
   static async get(handle) {
     const result = await db.query(
@@ -60,8 +45,6 @@ class Company {
           ON handle = company_handle
         WHERE handle=$1`,
       [handle]);
-
-    console.log(result.rows);
 
     if (result.rows.length === 0) {
       throw new ExpressError("Handle does not match any companies", 404);
