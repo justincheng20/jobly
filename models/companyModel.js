@@ -8,6 +8,15 @@ const sqlForPartialUpdate = require("../helpers/partialUpdate");
 const MAX_INTEGER = 2147483647;
 
 class Company {
+
+  constructor({handle, name, num_employees, description, logo_url}){
+    this.handle = handle;
+    this.name = name;
+    this.num_employees = num_employees;
+    this.description = description;
+    this.logo_url = logo_url;
+  }
+
   // parameters => {search: "", min_employees: #, max_employees: #}
   // returns list filtered by parameters (optional)
   static async getCompanies({ searchTerm = "", min_employees = 0, max_employees = MAX_INTEGER }) {
@@ -43,7 +52,6 @@ class Company {
 
   // Inserts a new company into our database
   static async create({handle, name, num_employees = 0, description, logo_url}) {
-    
     const result = await db.query(
       `INSERT INTO companies
         (handle, name, num_employees, description, logo_url)
@@ -65,8 +73,6 @@ class Company {
       }
       return result.rows[0];
     } catch (err) {
-      // TODO: Come back later and figure out how to deal with database errors
-      // err.message = err.message || "Temporary placeholder for database errors";
       err.status = err.status || 400;
       throw err;
     }
