@@ -26,8 +26,8 @@ router.get("/", async function (req, res, next) {
 
 /**
  * POST /companies -> make a new company
- * Expects JSON: {handle (required), name (required), 
- * num_employees (defaults to 0), description, logo_url } 
+ * Expects JSON: {handle, name, num_employees (defaults to 0),
+ * description (optional), logo_url (optional) } 
  */
 
 router.post("/", async function (req, res, next) {
@@ -92,10 +92,10 @@ router.delete("/:handle", async function (req, res, next) {
   try {
     let handle = req.params.handle;
     await Company.delete(handle);
-    return res.json({ message: "Deleted" })
+    return res.json({ message: "Deleted" });
   } catch (err) {
     return next(err);
   }
-})
+});
 
 module.exports = router;
