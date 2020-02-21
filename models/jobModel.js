@@ -68,6 +68,7 @@ class Job {
 
   static async update(id, data) {
     try {
+      // Consider: possibly update timestamp
       const { query, values } = sqlForPartialUpdate('jobs', data, 'id', id);
       const result = await db.query(query, values);
 
@@ -90,7 +91,7 @@ class Job {
     );
 
     if (result.rows.length === 0) {
-      throw new ExpressError("ID does not match any jobs");
+      throw new ExpressError("ID does not match any jobs", 404);
     }
   }
 }

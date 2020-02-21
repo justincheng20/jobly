@@ -6,11 +6,14 @@ const Company = require("../../models/companyModel");
 const Job = require("../../models/jobModel");
 
 let testCompany1;
+let testJob1;
+let testJob2;
 
 
 describe("Company Routes Test", function () {
 
     beforeEach(async function () {
+        await db.query("DELETE FROM jobs");
         await db.query("DELETE FROM companies");
 
         testCompany1 = await Company.create({
@@ -27,6 +30,10 @@ describe("Company Routes Test", function () {
             equity: 0,
             company_handle: "testHandle"
         });
+
+        // delete testJob1.date_posted;
+
+        // testJob1.date_posted = testJob1.date_posted.toString();
 
         testJob2 = await Job.create({
             title: "tester2tester",
@@ -63,65 +70,117 @@ describe("Company Routes Test", function () {
             expect(resp.body).toEqual({ jobs: expect.any(Array) });
             expect(resp.body.jobs.length).toBe(1);
         });
+    });
+
+    describe("POST /jobs", function () {
+        test("Can create a new job listing", async function () {
+            let testJob3 = {
+                title: "tester3tester",
+                salary: 3,
+                equity: .3,
+                company_handle: "testHandle"
+            }
+            let resp = await request(app)
+                .post("/jobs")
+                .send(testJob3);
+
+            const allJobs = await Job.getJobs({});
 
 
-        describe("POST /jobs", function () {
-            test("Can create a new job listing", async function () {
-                let testJob3 = {
-                    title: "tester3tester",
-                    salary: 3,
-                    equity: .3,
-                    company_handle: "testHandle"
+            // Q: Is it good practice to use expect.any(Object)?
+            expect(resp.body).toEqual({ job: expect.any(Object) });
+            // Is this better?
+            expect(resp.body.job).toBeInstanceOf(Object);
+            expect(resp.body).toMatchObject({ job: testJob3 });
+            expect(allJobs.length).toBe(3);
+        });
+
+        test("Can not create a job listing with invalid inputs", async function () {
+            let invalidJob = {
+                salary: "3",
+                equity: 5,
+                company_handle: "Non existent handle"
+            }
+            let resp = await request(app)
+                .post("/jobs")
+                .send(invalidJob);
+
+            const allJobs = await Job.getJobs({});
+
+            expect(resp.body).toEqual({ message: expect.any(Array), status: 400 })
+            expect(allJobs.length).toBe(2);
+        });
+    });
+
+
+    describe("Get /jobs/:id", function () {
+        test("Can get a job by its ID", async function () {
+            let id = testJob1.id;
+
+            let resp = await request(app).get(`/jobs/${id}`);
+            expect(resp.body).toMatchObject({
+                job: {
+                    id,
+                    company: testCompany1
                 }
-                let resp = await request(app)
-                    .post("/jobs")
-                    .send(testJob3);
-
-                const allJobs = await Job.getJobs({});
-                
-                
-                // Q: Is it good practice to use expect.any(Object)?
-                expect(resp.body).toEqual({ job: expect.any(Object) });
-                // Is this better?
-                expect(resp.body.job).toBeInstanceOf(Object);
-                expect(resp.body).toMatchObject({ job: testJob3 });
-                expect(allJobs.length).toBe(3);
-            });
-
-            test("Can not create a job listing with invalid inputs", async function () {
-                let invalidJob = {
-                    salary: "3",
-                    equity: 5,
-                    company_handle: "Non existent handle"
-                }
-                let resp = await request(app)
-                    .post("/jobs")
-                    .send(invalidJob);
-
-                const allJobs = await Job.getJobs({});
-
-                expect(resp.body).toEqual({ message: expect.any(Array), status: 400 })
-                expect(allJobs.length).toBe(2);
             });
         });
 
+        test("Returns 404 error on invalid id", async function () {
+            let id = "-1";
+            let resp = await request(app).get(`/jobs/${id}`);
+            expect(resp.body).toEqual({ message: expect.any(String), status: 404 });
+        });
+    });
 
-        describe("Get /jobs/:id", function () {
-            test("Can get a job by its ID", async function () {
-                let id = testJob1.id;
-                
-                let resp = await request(app).get(`/jobs/${id}`);
-                expect(resp.body).toEqual({ job: expect.any(Object) });
-            });
+    describe("Patch /jobs/:id", function () {
+        test("Can patch job with a full object", async function () {
+            // ('full' as in all of the schema-accepted updates)
+            let testJob3 = {
+                title: "tester3tester",
+                salary: 3,
+                equity: .3,
+                company_handle: "testHandle"
+            };
+
+            let id = testJob1.id;
+            let resp = await request(app)
+                .patch(`/jobs/${id}`)
+                .send(testJob3);
+
+            expect(resp.body).toMatchObject({ job: testJob3 });
+            let allJobs = await Job.getJobs({});
+            expect(allJobs.length).toBe(2);
+        });
+
+        test("Can patch job with less changes", async function () {
+            let id = testJob1.id;
+            let expected = {
+                id,
+                title: "changed"
+            };
+
+            let resp = await request(app)
+                .patch(`/jobs/${id}`)
+                .send({ title: "changed" });
+
+            expect(resp.body).toMatchObject({ job: expected });
+        });
+
+    });
     
-            test("Returns 404 error on invalid id", async function () {
-                let id = "-1";
-                let resp = await request(app).get(`/jobs/${id}`);
-                expect(resp.body).toEqual({ message: expect.any(String), status: 404 });
-            });
+    describe("Delete /jobs/:id", function(){
+        test("Can delete a company", async function(){
+            let id = testJob1.id;
+            let resp = await request(app).delete(`/jobs/${id}`);
+            expect(resp.body).toEqual({message: "Deleted"});
         });
 
-
+        test("Returns 404 on invalid id", async function(){
+            let id = -1;
+            let resp = await request(app).delete(`/jobs/${id}`);
+            expect(resp.body).toEqual({message: expect.any(String), status: 404});
+        })
     });
 
 

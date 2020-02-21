@@ -128,18 +128,15 @@ describe("Company Routes Test", function () {
         });
 
         test("Can patch company with partial data", async function () {
-            let smallChange = {
-                description: "description test!"
-            };
             let expected = {
                 ...testCompany1
             };
-            expected.description = smallChange.description;
+            expected.description = "description test!";
 
             let handle = testCompany1.handle;
             let resp = await request(app)
                 .patch(`/companies/${handle}`)
-                .send(smallChange);
+                .send({ description: "description test!" });
 
             expect(resp.body).toEqual({ company: expected });
         });
@@ -159,11 +156,10 @@ describe("Company Routes Test", function () {
         });
 
         test("Returns 400 error on invalid info", async function () {
-            let invalidChange = { num_employees: "3" }
             let handle = testCompany1.handle;
             let resp = await request(app)
                 .patch(`/companies/${handle}`)
-                .send(invalidChange);
+                .send({ num_employees: "3" });
 
             expect(resp.body).toEqual({ message: expect.any(Array), status: 400 });
             expect(resp.body.message.length).toBe(1);
