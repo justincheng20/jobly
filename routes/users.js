@@ -5,6 +5,8 @@ const ExpressError = require("../helpers/expressError");
 const jsonschema = require("jsonschema");
 const userSchema = require("../schemas/userSchema");
 const userUpdateSchema = require("../schemas/userUpdateSchema");
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = require("../config");
 
 
 /**
@@ -36,7 +38,9 @@ router.post("/", async function (req, res, next) {
     }
 
     const user = await User.create(req.body);
-    return res.json({ user });
+    let _token = jwt.sign({username: user.username}, SECRET_KEY);
+    
+    return res.json({_token});
   } catch (err) {
     return next(err);
   }

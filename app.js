@@ -1,10 +1,9 @@
 /** Express app for jobly. */
 
 const express = require("express");
-
 const ExpressError = require("./helpers/expressError");
-
 const morgan = require("morgan");
+const { authenticateJWT, ensureLoggedIn } = require("./middleware/authMiddleware");
 
 const app = express();
 
@@ -12,14 +11,17 @@ app.use(express.json());
 
 // add logging system
 app.use(morgan("tiny"));
+app.use(authenticateJWT);
 
 const companyRoutes = require("./routes/companies");
 const jobRoutes = require("./routes/jobs");
 const userRoutes = require("./routes/users");
+const authRoutes = require("./routes/auth");
 
 app.use("/companies", companyRoutes);
 app.use("/jobs", jobRoutes);
 app.use("/users", userRoutes);
+app.use("/auth", authRoutes);
 
 /** 404 handler */
 

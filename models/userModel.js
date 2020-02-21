@@ -36,6 +36,22 @@ class User {
     }
   }
 
+  static async authenticate(username, password){
+    const result = await db.query(
+      "SELECT password FROM users WHERE username = $1", 
+      [username]);
+    let user = result.rows[0];
+
+    if(user){
+      if(await bcrypt.compare(password, user.password)){
+        console.log("this shouldn't be here")
+        return true;
+      }
+    }
+    console.log("RETURNING FALSE");
+    return false;
+  }
+
   static async getUsers() {
     const results = await db.query(
       `SELECT username, first_name, last_name, email

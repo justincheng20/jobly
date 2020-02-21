@@ -2,7 +2,7 @@
 
 require("dotenv").config();
 
-const SECRET_KEY = process.env.SECRET_KEY || "test";
+const SECRET_KEY = process.env.SECRET_KEY || "don't tell anyone";
 const BCRYPT_WORK_FACTOR = 12;
 
 const PORT = +process.env.PORT || 3000;
