@@ -1,6 +1,6 @@
 # Jobly
 
-This is a backend for a job posting site, built using Node, Express, and Postgres.
+This is a backend for a job posting site, built using Express and Postgres.
 
 CRUD routes have been implemented for:
 - Users
